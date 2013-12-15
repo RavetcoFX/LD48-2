@@ -13,7 +13,7 @@ public class EntityEarth
 	private Main main;
 	public ImageIcon imgOne = new ImageIcon(this.getClass().getResource("/res/earth.png"));
 	public Image sprt;
-	private static final int START_X = 330, START_Y = 200;
+	private static final int START_X = 330, START_Y = 100;
 	
 	public boolean isAlive;
 	public static int x, y, width, height;
