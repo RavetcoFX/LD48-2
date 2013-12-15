@@ -23,14 +23,12 @@ import javax.swing.JFrame;
 import com.ravensprie.ld28.entity.EntityEarth;
 /**
  * 
- *
- * My Ludum Dare Submission for the "You only get one"
+ * Ludum Dare Submission for the theme "You only get one"
  * 
  * All rights reserved Ravenspire
  * 
  * @author Ravenspire
  * 
- * Can anyone see this????
  * 
  */
 
@@ -52,16 +50,20 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	private Font textFont = new Font("Arial", Font.BOLD, 12);
 	private Thread thread;
 	
-	public ImageIcon imgMenu = new ImageIcon(this.getClass().getResource("/res/menu.png"));
+	public ImageIcon imgLogo = new ImageIcon(this.getClass().getResource("/res/ravenspire.png"));
+	public ImageIcon imgTitle = new ImageIcon(this.getClass().getResource("/res/title.png"));
 	public ImageIcon imgGloss = new ImageIcon(this.getClass().getResource("/res/gloss.png"));
+	public ImageIcon imgEarth = new ImageIcon(this.getClass().getResource("/res/earth.png"));
 	public ImageIcon imgAboutBut1 = new ImageIcon(this.getClass().getResource("/res/but/button1.png"));
 	public ImageIcon imgAboutBut2 = new ImageIcon(this.getClass().getResource("/res/but/button2.png"));
 	public ImageIcon imgAboutBut1l = new ImageIcon(this.getClass().getResource("/res/but/button1_light.png"));
 	public ImageIcon imgAboutBut2l = new ImageIcon(this.getClass().getResource("/res/but/button2_light.png"));
 
 
-	public Image sprtMenu = imgMenu.getImage();
+	public Image sprtLogo = imgLogo.getImage();
+	public Image sprtTitle = imgTitle.getImage();
 	public Image sprtGloss = imgGloss.getImage();
+	public Image sprtEarth = imgEarth.getImage();
 	public Image sprtBut1 = imgAboutBut1.getImage();
 	public Image sprtBut2 = imgAboutBut2.getImage();
 	
@@ -74,8 +76,6 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	private boolean isBut1Pressed = false;
 	private boolean isBut2Pressed = false;
 
-	
-	private int but1X = 596, but1Y = 237, but2X = 31, but2Y = 229;
 	private long lastTimer;
 	
 	public int oilLevel = 100;
@@ -87,8 +87,8 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	public int starXSeed[] = new int[1000];
 	public int starYSeed[] = new int[1000];
 	
-	public Rectangle rectBut1 = new Rectangle(but1X, but1Y, sprtBut1.getWidth(null), sprtBut1.getHeight(null));
-	public Rectangle rectBut2 = new Rectangle(but2X, but2Y, sprtBut2.getWidth(null), sprtBut2.getHeight(null));;
+	public Rectangle rectBut1;
+	public Rectangle rectBut2;
 	
 	public Main()
 	{
@@ -205,9 +205,14 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 			g.setColor(graphite);
 			g.fillRect(0, 0, 800, 880);//draws the canvas
 			
-			g.drawImage(sprtMenu, 0, 0, this);
-			g.drawImage(sprtBut1, but1X, but1Y, this);
-			g.drawImage(sprtBut2, but2X, but2Y, this);
+			g.drawImage(sprtTitle, 260, 10, this);
+			g.drawImage(sprtEarth, 315, 220, this);
+			g.drawImage(sprtLogo, 525, 420, this);
+			g.drawImage(sprtBut1, 600, 230, this);
+			g.drawImage(sprtBut2, 30, 230, this);
+			
+			rectBut1 = new Rectangle(600, 230, sprtBut1.getWidth(null), sprtBut1.getHeight(null));
+			rectBut2 = new Rectangle(30, 230, sprtBut2.getWidth(null), sprtBut2.getHeight(null));
 		}
 		
 		//Game Render
@@ -217,6 +222,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 			g.fillRect(0, 0, WIDTH, HEIGHT);//draws the canvas
 			
 			if(hasStarted){
+				
 				//Draws Stars
 				int sizex = 1;
 				int sizey = 1;
@@ -227,7 +233,6 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 						g.drawOval(starXSeed[i], starYSeed[i], rand.nextInt(2), rand.nextInt(2));
 					}
 				}
-				
 				//Placeholder moon
 				g.setColor(Color.darkGray);
 				g.fillOval(-390, 400, WIDTH * 2, WIDTH * 2);
@@ -239,6 +244,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				//Panel
 				g.setColor(panel);
 				g.fillRect(0, 450, WIDTH, 50);
+				
 				//Amount Bars
 				g.setFont(textFont);
 				g.setColor(Color.BLACK);
@@ -290,8 +296,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				g.setColor(Color.BLACK);
 				g.drawString("" + tempurture, 556, 468); //pollution num
 
-
-				g.drawImage(sprtGloss, 0, 0, this); //Panel Gloss
+				g.drawImage(sprtGloss, 0, 448, this); //Panel Gloss
 				
 				g.drawImage(earth.getSprt(), earth.getX(), earth.getY(), this); //Earth sprite
 				
@@ -369,18 +374,6 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		}
 		
 	}
-	
-	public void keyReleased(KeyEvent e){	
-		
-	}
-	
-	public void mouseMoved(MouseEvent e) {
-		
-	}
-
-	public void mouseClicked(MouseEvent e) {
-		
-	}
 
 	public void mousePressed(MouseEvent e) 
 	{
@@ -400,17 +393,30 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	public void mouseReleased(MouseEvent e) {
 		int mx = e.getX(), my = e.getY();
 		//Start button
+		sprtBut1 = imgAboutBut1.getImage();
 		if(mx > rectBut1.x && mx < rectBut1.x + rectBut1.width){
-			sprtBut1 = imgAboutBut1.getImage();
 			if(isBut1Pressed){
 				isBut1Pressed = false;
 				startGame();
 			}
 		}
 		//about button
-		if(mx > rectBut2.x && mx < rectBut2.x + rectBut2.width){
-			sprtBut2 = imgAboutBut2.getImage();
-		}
+		sprtBut2 = imgAboutBut2.getImage();
+
+	}
+	
+	public void mouseMoved(MouseEvent e) 
+	{
+		
+		
+	}
+	
+	public void keyReleased(KeyEvent e){	
+		
+	}
+	
+	public void mouseClicked(MouseEvent e) {
+		
 	}
 
 	public void keyTyped(KeyEvent e) {

@@ -13,10 +13,11 @@ public class EntityEarth
 	private Main main;
 	public ImageIcon imgOne = new ImageIcon(this.getClass().getResource("/res/earth.png"));
 	public Image sprt;
-	private static final int START_X = 330, START_Y = 100;
+	private static final int START_X = 330, START_Y = 140;
 	
 	public boolean isAlive;
 	public static int x, y, width, height;
+	public int health = 100;
 	private int tickCount;
 	private boolean goUp = true;
 	private int cnt = 0;
@@ -69,6 +70,10 @@ public class EntityEarth
 		return y;
 	}
 	
+	public int getHealth()
+	{
+		return health;
+	}
 	
 	public Rectangle getBounds()
 	{
