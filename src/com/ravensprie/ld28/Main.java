@@ -43,7 +43,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	private static final long serialVersionUID = 602801997L;
 	
 	public static final String TITLE = "Only One Earth";
-	public static final String VERSION = "0.4.4";
+	public static final String VERSION = "0.5";
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 500;
 	public static final int FPS = 30;
