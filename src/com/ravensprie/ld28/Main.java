@@ -39,7 +39,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	private static final long serialVersionUID = 602801997L;
 	
 	public static final String TITLE = "Only One Earth";
-	public static final String VERSION = "0.4";
+	public static final String VERSION = "0.4.1";
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 500;
 	public static final int FPS = 30;
@@ -49,7 +49,8 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	public Color graphite = new Color(40, 40, 40);
 	public Color panel = new Color(140, 140, 140);
 	private Random rand = new Random();
-	private Font textFont = new Font("Arial", Font.BOLD, 12);  
+	private Font textFont = new Font("Arial", Font.BOLD, 12);
+	private Thread thread;
 	
 	public ImageIcon imgMenu = new ImageIcon(this.getClass().getResource("/res/menu.png"));
 	public ImageIcon imgGloss = new ImageIcon(this.getClass().getResource("/res/gloss.png"));
@@ -66,6 +67,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	
 	private static boolean running = false;
 	private boolean inMenu = true;
+	private boolean inAbout = false;
 	private boolean inGame = false;
 	private boolean isDebug = false;
 	private boolean hasStarted = false;
@@ -113,12 +115,18 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	public synchronized void start()
 	{
 		running = true;
-		new Thread(this).start();
+		thread = new Thread(this);
+		thread.start();
 	}
 	
 	public synchronized void stop()
 	{
 		running = false;
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void run() 
@@ -234,42 +242,54 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				//Amount Bars
 				g.setFont(textFont);
 				g.setColor(Color.BLACK);
-				
+				pollution = 100;
 				g.drawString("Population: ", 0, 467);
 				g.setColor(Color.WHITE);
 				g.drawRect(82, 454, 101, 20); //Population bar outline
 				g.setColor(new Color(143, 84, 63));
 				g.fillRect(83, 455, population, 19); //Population bar fill
 				g.setColor(Color.black);
-				g.drawString("" + population, 120, 468);
-
+				g.drawString("" + population, 120, 468); //Population num
+				
 				g.setColor(Color.BLACK);	
 				g.drawString("Resources: ", 0, 493);
 				g.setColor(Color.WHITE);
 				g.drawRect(82, 478, 101, 20); //oil bar outline
 				g.setColor(Color.BLACK);
 				g.fillRect(83, 479, oilLevel, 19); //oil bar fill
+				g.setColor(Color.WHITE);
+				g.drawString("" + oilLevel, 120, 493); //oil num
+
 				
 				g.setColor(Color.BLACK);
 				g.drawString("Pollution: ", 200, 467);
 				g.setColor(Color.WHITE);
 				g.drawRect(299, 454, 101, 20); //pollution bar outline
-				g.setColor(new Color(139, 147, 101));
+				g.setColor(new Color(109, 135, 0));
 				g.fillRect(300, 455, pollution, 19); //pollution bar fill
+				g.setColor(Color.BLACK);
+				g.drawString("" + pollution, 336, 468); //pollution num
+
 				
 				g.setColor(Color.BLACK);
 				g.drawString("Fresh Water: ", 200, 493);
 				g.setColor(Color.WHITE);
 				g.drawRect(299, 478, 101, 20); //water bar outline
-				g.setColor(Color.BLUE);
+				g.setColor(new Color(0, 102, 255));
 				g.fillRect(300, 479, freshWater, 19); //water bar fill
+				g.setColor(Color.WHITE);
+				g.drawString("" + freshWater, 336, 493); //water num
+
 				
 				g.setColor(Color.BLACK);
 				g.drawString("Tempurture: ", 420, 467);
 				g.setColor(Color.WHITE);
 				g.drawRect(515, 454, 101, 20); //Temperature bar outline
-				g.setColor(Color.RED);
+				g.setColor(new Color(213, 55, 55));
 				g.fillRect(516, 455, tempurture*2, 19); //Temperature bar fill
+				g.setColor(Color.BLACK);
+				g.drawString("" + tempurture, 556, 468); //pollution num
+
 
 				g.drawImage(sprtGloss, 0, 0, this); //Panel Gloss
 				
@@ -287,6 +307,25 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		bs.show();
 	}
 	
+	public void refreshStars()
+	{
+		for(int i=0;i<=numStars;i++){
+			starXSeed[i] = rand.nextInt(800);
+		}
+		for(int i=0;i<=numStars;i++){
+			starYSeed[i] = rand.nextInt(500);
+		}
+	}
+	
+	public void startGame()
+	{
+		if(!inGame){
+			inMenu = false;
+			inGame = true;
+			System.out.println("Game Entered");
+		}
+	}
+	
 	public void resetGame()
 	{
 		oilLevel = 100;
@@ -295,10 +334,6 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		pollution = 100;
 		tempurture = 50;
 		numStars = 500;
-		if(inGame){
-			inMenu = true;
-			inGame = false;
-		}
 		init();
 	}
 	
@@ -308,16 +343,19 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		int keyCode = e.getKeyCode();
 		
 		if (keyCode == KeyEvent.VK_SPACE || keyCode == KeyEvent.VK_ENTER) { //Please use buttons later to enter the game, not a cheaty button press!!!
-			if(!inGame){
-				inMenu = false;
-				inGame = true;
-				System.out.println("Game Entered");
-			}
+			startGame();
 		}
 		
 		if (keyCode == KeyEvent.VK_ESCAPE){
 			if(!inMenu){
 				System.out.println("Game Exited");
+				if(inGame){
+					inMenu = true;
+					inGame = false;
+				}
+				if(inAbout){
+					
+				}
 				resetGame();
 			}
 		}
@@ -325,6 +363,15 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		if (keyCode == KeyEvent.VK_F3){
 			isDebug = !isDebug;
 		}
+		
+		if (keyCode == KeyEvent.VK_F7){
+			refreshStars();
+		}
+		
+	}
+	
+	public void keyReleased(KeyEvent e){	
+		
 	}
 	
 	public void mouseMoved(MouseEvent e) {
@@ -338,33 +385,35 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	public void mousePressed(MouseEvent e) 
 	{
 		int mx = e.getX(), my = e.getY();
-		
+		//start button
 		if(mx > rectBut1.x && mx < rectBut1.x + rectBut1.width){
 			isBut1Pressed = true;
 			sprtBut1 = imgAboutBut1l.getImage();
 		}
+		//About button
 		if(mx > rectBut2.x && mx < rectBut2.x + rectBut2.width){
 			isBut2Pressed = true;
 			sprtBut2 = imgAboutBut2l.getImage();
 		}
 	}
-
 	
 	public void mouseReleased(MouseEvent e) {
 		int mx = e.getX(), my = e.getY();
-		
+		//Start button
 		if(mx > rectBut1.x && mx < rectBut1.x + rectBut1.width){
 			sprtBut1 = imgAboutBut1.getImage();
+			if(isBut1Pressed){
+				isBut1Pressed = false;
+				startGame();
+			}
 		}
+		//about button
 		if(mx > rectBut2.x && mx < rectBut2.x + rectBut2.width){
 			sprtBut2 = imgAboutBut2.getImage();
 		}
 	}
-	public void keyTyped(KeyEvent e) {
-		
-	}
 
-	public void keyReleased(KeyEvent e) {
+	public void keyTyped(KeyEvent e) {
 		
 	}
 
