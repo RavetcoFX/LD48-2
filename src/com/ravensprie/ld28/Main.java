@@ -209,6 +209,8 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		if(inGame){
 			if(!hasStarted){
 				init();
+				
+				
 			}
 			earth.tick();
 			//Remove later doto crashing when leaving a monitor
@@ -225,6 +227,11 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 			}
 			actTemp = tempurture/2;
 		}
+	}
+	
+	public void checkStats()
+	{
+		
 	}
 	
 	public void init()
@@ -364,7 +371,11 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 
 				g.drawImage(sprtGloss, 0, 448, this); //Panel Gloss
 				
-				g.drawImage(earth.getSprt(), earth.getX(), earth.getY(), this); //Earth sprite
+				g.drawImage(earth.sprt1, earth.getX(), earth.getY(), this); //Earth sprite
+				g.drawImage(earth.sprt2, earth.getX(), earth.getY(), this); //Earth sprite
+				g.drawImage(earth.sprt3, earth.getX(), earth.getY(), this); //Earth sprite
+				g.drawImage(earth.sprt4, earth.getX(), earth.getY(), this); //Earth sprite
+
 				
 				g.drawImage(sun.getSprt(), sun.getX(), sun.getY(), this); //Sun sprite
 

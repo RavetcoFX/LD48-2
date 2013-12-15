@@ -11,8 +11,16 @@ public class EntityEarth
 {
 	
 	private Main main;
-	public ImageIcon imgOne = new ImageIcon(this.getClass().getResource("/res/earth.png"));
-	public Image sprt;
+	public ImageIcon imgA = new ImageIcon(this.getClass().getResource("/res/air.png"));
+	public ImageIcon imgW = new ImageIcon(this.getClass().getResource("/res/water.png"));
+	public ImageIcon imgL = new ImageIcon(this.getClass().getResource("/res/land.png"));
+	public ImageIcon imgG = new ImageIcon(this.getClass().getResource("/res/earthG.png"));
+
+	public Image sprt1;
+	public Image sprt2;
+	public Image sprt3;
+	public Image sprt4;
+
 	private static final int START_X = 330, START_Y = 140;
 	
 	public boolean isAlive;
@@ -27,12 +35,15 @@ public class EntityEarth
 	public EntityEarth()
 	{
 		new Thread().start();
-		sprt = imgOne.getImage();
+		sprt1 = imgA.getImage();
+		sprt2 = imgW.getImage();
+		sprt3 = imgL.getImage();
+		sprt4 = imgG.getImage();
 		isAlive = true;
 		x = START_X;
 		y = START_Y;
-		width = sprt.getWidth(null);
-		height = sprt.getHeight(null);
+		width = sprt1.getWidth(null);
+		height = sprt1.getHeight(null);
 	}
 	
 	public void tick()
@@ -43,11 +54,6 @@ public class EntityEarth
 			if(cnt==bobHeight){ goUp=false; }
 			if(cnt==0){ goUp=true; }
 		}
-	}
-	
-	public Image getSprt()
-	{
-		return sprt;
 	}
 	
 	public int getWidth()
