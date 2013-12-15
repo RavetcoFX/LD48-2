@@ -7,6 +7,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
@@ -20,8 +23,10 @@ import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import com.ravensprie.ld28.entity.EntityEarth;
+import com.ravensprie.ld28.entity.EntitySun;
 /**
  * 
  * Ludum Dare Submission for the theme "You only get one"
@@ -45,6 +50,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	
 	private JFrame frame;
 	private EntityEarth earth;
+	private EntitySun sun;
 	public Color graphite = new Color(40, 40, 40);
 	public Color panel = new Color(140, 140, 140);
 	private Random rand = new Random();
@@ -97,18 +103,19 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	private boolean can4 = true;
 	private boolean can5 = true;
 
-
 	private long lastTimer;
 	
 	public int oilLevel = 100;
 	public int population = 100;
 	public int freshWater = 100;
 	public int pollution = 100;
-	public int tempurture = 50;
+	public int tempurture = 100;
+	public int actTemp = 0;
 	public int numStars = 500;
 	public int starXSeed[] = new int[1000];
 	public int starYSeed[] = new int[1000];
 	public int timeSecconds = 0;
+	public int mosX, mosY;
 	
 	public Rectangle rectBut1, rectBut2, rectBut3, rectBut4;
 	
@@ -204,12 +211,26 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				init();
 			}
 			earth.tick();
+			//Remove later doto crashing when leaving a monitor
+			if(isDebug){
+				try{
+					PointerInfo b = MouseInfo.getPointerInfo();
+					Point point = new Point(b.getLocation());
+					SwingUtilities.convertPointFromScreen(point, this);
+					mosX = (int) point.getX();
+					mosY = (int) point.getY();
+				}
+				catch(NullPointerException e) {}
+
+			}
+			actTemp = tempurture/2;
 		}
 	}
 	
 	public void init()
 	{
 		earth = new EntityEarth();
+		sun = new EntitySun();
 		hasStarted = true;
 		
 		for(int i=0;i<=numStars;i++){
@@ -238,13 +259,20 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 			g.fillRect(0, 0, 800, 880);//draws the canvas
 			
 			g.drawImage(sprtTitle, 260, 10, this);
-			g.drawImage(sprtEarth, 315, 220, this);
+			//g.drawImage(sprtEarth, 315, 220, this);
 			g.drawImage(sprtLogo, 525, 420, this);
-			g.drawImage(sprtBut1, 600, 230, this);
-			g.drawImage(sprtBut2, 30, 230, this);
+			g.drawImage(sprtBut1, 300, 230, this);
+			g.drawImage(sprtBut2, 300, 340, this);
 			
-			rectBut1 = new Rectangle(600, 230, sprtBut1.getWidth(null), sprtBut1.getHeight(null));
-			rectBut2 = new Rectangle(30, 230, sprtBut2.getWidth(null), sprtBut2.getHeight(null));
+			rectBut1 = new Rectangle(300, 238, sprtBut1.getWidth(null), sprtBut1.getHeight(null)-15);
+			rectBut2 = new Rectangle(300, 348, sprtBut2.getWidth(null), sprtBut2.getHeight(null)-15);
+			
+			if(isDebug){
+				g.setColor(Color.WHITE);
+				g.drawRect(rectBut1.x, rectBut1.y, rectBut1.width, rectBut1.height);
+				g.drawRect(rectBut2.x, rectBut2.y, rectBut2.width, rectBut2.height);
+
+			}
 		}
 		
 		//Game Render
@@ -272,8 +300,8 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				g.fillOval(-390, 400, WIDTH * 2, WIDTH * 2);
 				
 				//Placeholder sun
-				g.setColor(Color.yellow);
-				g.fillOval(20, 20, 50, 50);
+				//g.setColor(Color.yellow);
+				//g.fillOval(20, 20, 50, 50);
 				
 				//Panel
 				g.setColor(panel);
@@ -282,7 +310,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				//Amount Bars
 				g.setFont(textFont);
 				g.setColor(Color.BLACK);
-				pollution = 100;
+
 				g.drawString("Population: ", 0, 467);
 				g.setColor(Color.WHITE);
 				g.drawRect(82, 454, 101, 20); //Population bar outline
@@ -302,7 +330,6 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				g.setColor(Color.WHITE);
 				g.drawString("" + oilLevel, 120, 493); //oil num
 
-				
 				g.setColor(Color.BLACK);
 				g.drawString("Pollution: ", 200, 467);
 				g.setColor(Color.WHITE);
@@ -331,18 +358,26 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				g.drawRect(515, 454, 101, 20); //Temperature bar outline
 				if(can5){ g.setColor(new Color(255, 49, 49)); }
 				else{ g.setColor(new Color(213, 132, 132)); }
-				g.fillRect(516, 455, tempurture*2, 19); //Temperature bar fill, times 2 to fill bar
+				g.fillRect(516, 455, tempurture, 19);
 				g.setColor(Color.BLACK);
-				g.drawString("" + tempurture, 556, 468); //pollution num
+				g.drawString("" + actTemp, 556, 468); //pollution num
 
 				g.drawImage(sprtGloss, 0, 448, this); //Panel Gloss
 				
 				g.drawImage(earth.getSprt(), earth.getX(), earth.getY(), this); //Earth sprite
 				
+				g.drawImage(sun.getSprt(), sun.getX(), sun.getY(), this); //Sun sprite
+
+				
 				if(isDebug){
 					g.setColor(Color.WHITE);
 					Rectangle earthRect = earth.getBounds();
 					g.draw(earthRect);
+					
+					g.setFont(textFont2);
+					g.setColor(Color.WHITE);
+					g.drawString("mX:" + mosX, 700, 30);
+					g.drawString("mY:" + mosY, 700, 48); 
 				}
 				
 				//Message box
@@ -354,6 +389,12 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 					g.setFont(textFont2);
 					g.drawString("Do you really ", 355, 200);
 					g.drawString("want to quit?", 355, 230);
+					
+					if(isDebug){
+						g.setColor(Color.white);
+						g.drawRect(280, 245, sprtBut3.getWidth(null), sprtBut3.getHeight(null));
+						g.drawRect(450, 245, sprtBut4.getWidth(null), sprtBut4.getHeight(null));
+					}
 				}
 			}
 		}
@@ -387,7 +428,8 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		population = 100;
 		freshWater = 100;
 		pollution = 100;
-		tempurture = 50;
+		tempurture = 100;
+		actTemp = 0;
 		numStars = 500;
 		can1 = true;
 		can2 = true;
@@ -420,42 +462,44 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 			}
 		}
 		
-		if (keyCode == KeyEvent.VK_1){
-			can1 = !can1;
-		}
-		if (keyCode == KeyEvent.VK_2){
-			can2 = !can2;
-		}
-		if (keyCode == KeyEvent.VK_3){
-			can3 = !can3;
-		}
-		if (keyCode == KeyEvent.VK_4){
-			can4 = !can4;
-		}
-		if (keyCode == KeyEvent.VK_5){
-			can5 = !can5;
-		}
 		
 		if (keyCode == KeyEvent.VK_F3){
 			isDebug = !isDebug;
 		}
 		
-		if (keyCode == KeyEvent.VK_F7){
-			refreshStars();
+		if(isDebug){
+			if (keyCode == KeyEvent.VK_1){
+				can1 = !can1;
+			}
+			if (keyCode == KeyEvent.VK_2){
+				can2 = !can2;
+			}
+			if (keyCode == KeyEvent.VK_3){
+				can3 = !can3;
+			}
+			if (keyCode == KeyEvent.VK_4){
+				can4 = !can4;
+			}
+			if (keyCode == KeyEvent.VK_5){
+				can5 = !can5;
+			}
+			
+			if (keyCode == KeyEvent.VK_F7){
+				refreshStars();
+			}
 		}
-		
 	}
 
 	public void mousePressed(MouseEvent e) 
 	{
 		int mx = e.getX(), my = e.getY();
 		//start button
-		if(mx > rectBut1.x && mx < rectBut1.x + rectBut1.width){
+		if(mx > rectBut1.x && mx < rectBut1.x + rectBut1.width && my > rectBut1.y && my < rectBut1.y + rectBut1.height){
 			isBut1Pressed = true;
 			sprtBut1 = imgAboutBut1l.getImage();
 		}
 		//About button
-		if(mx > rectBut2.x && mx < rectBut2.x + rectBut2.width){
+		if(mx > rectBut2.x && mx < rectBut2.x + rectBut2.width && my > rectBut2.y && my < rectBut2.y + rectBut2.height){
 			isBut2Pressed = true;
 			sprtBut2 = imgAboutBut2l.getImage();
 		}
@@ -474,67 +518,67 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		
 		//Population bar
 		if(can1){
-			if(mx > 84 && mx < 183 && my > 450 && my < 475){
-				for(int x=83; x <= 183; x++){
+			if(mx > 84 && mx < 183 && my > 455 && my < 475){
+				for(int x=84; x <= 183; x++){
 					if(mx == x){
-						population = x-82;
+						population = x-83;
 					}
 				}
 			}
-			if(mx < 84 && mx > 70){ population = 0; }
-			if(mx > 183 && mx < 210){ population = 100; }
+			if(mx < 84 && mx > 70 && my > 455 && my < 475){ population = 0; }
+			if(mx > 184 && mx < 210 && my > 455 && my < 475){ population = 100; }
 		}
 		
 		//Resources bar
 		if(can2){
-			if(mx > 84 && mx < 183 && my > 450 && my < 475){
-				for(int x=83; x <= 183; x++){
+			if(mx > 84 && mx < 183 && my > 480 && my < 500){
+				for(int x=84; x <= 183; x++){
 					if(mx == x){
-						oilLevel = x-82;
+						oilLevel = x-83;
 					}
 				}
 			}
-			if(mx < 84 && mx > 70){ oilLevel = 0; }
-			if(mx > 183 && mx < 210){ oilLevel = 100; }
+			if(mx < 84 && mx > 70 && my > 480 && my < 500){ oilLevel = 0; }
+			if(mx > 184 && mx < 210 && my > 480 && my < 500){ oilLevel = 100; }
 		}
 		
 		//Pollution bar
 		if(can3){
-			if(mx > 84 && mx < 183 && my > 450 && my < 475){
-				for(int x=83; x <= 183; x++){
+			if(mx > 300 && mx < 400 && my > 455 && my < 475){
+				for(int x=300; x <= 400; x++){
 					if(mx == x){
-						pollution = x-82;
+						pollution = x-300;
 					}
 				}
 			}
-			if(mx < 84 && mx > 70){ pollution = 0; }
-			if(mx > 183 && mx < 210){ pollution = 100; }
+			if(mx < 300 && mx > 290 && my > 455 && my < 475){ pollution = 0; }
+			if(mx > 400 && mx < 410 && my > 455 && my < 475){ pollution = 100; }
 		}
 		
 		//Water bar
 		if(can4){
-			if(mx > 84 && mx < 183 && my > 450 && my < 475){
-				for(int x=83; x <= 183; x++){
+			if(mx > 300 && mx < 400 && my > 480 && my < 500){
+				for(int x=300; x <= 400; x++){
 					if(mx == x){
-						freshWater = x-82;
+						freshWater = x-300;
 					}
 				}
 			}
-			if(mx < 84 && mx > 70){ freshWater = 0; }
-			if(mx > 183 && mx < 210){ freshWater = 100; }
+			if(mx < 300 && mx > 290 && my > 480 && my < 500){ freshWater = 0; }
+			if(mx > 400 && mx < 410 && my > 480 && my < 500){ freshWater = 100; }
 		}
 		
 		//Temp bar
 		if(can5){
-			if(mx > 84 && mx < 183 && my > 450 && my < 475){
-				for(int x=83; x <= 183; x++){
+			if(mx > 515 && mx < 615 && my > 455 && my < 475){
+				for(int x=515; x <= 615; x++){
 					if(mx == x){
-						tempurture = x-82;
+						tempurture = x-515;
 					}
 				}
 			}
-			if(mx < 84 && mx > 70){ tempurture = 0; }
-			if(mx > 183 && mx < 210){ tempurture = 100; }
+			if(mx < 515 && mx > 505 && my > 455 && my < 475){ tempurture = 0; }
+			if(mx > 615 && mx < 625 && my > 455 && my < 475){ tempurture = 100; }
 		}
 	}
 	
@@ -543,7 +587,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		int mx = e.getX(), my = e.getY();
 		//Start button
 		sprtBut1 = imgAboutBut1.getImage();
-		if(mx > rectBut1.x && mx < rectBut1.x + rectBut1.width){
+		if(mx > rectBut1.x && mx < rectBut1.x + rectBut1.width && my > rectBut1.y && my < rectBut1.y + rectBut1.height){
 			if(isBut1Pressed){
 				isBut1Pressed = false;
 				startGame();
@@ -551,7 +595,7 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		}
 		//About button
 		sprtBut2 = imgAboutBut2.getImage();
-		if(mx > rectBut2.x && mx < rectBut2.x + rectBut2.width){
+		if(mx > rectBut2.x && mx < rectBut2.x + rectBut2.width && my > rectBut2.y && my < rectBut2.y + rectBut2.height){
 			if(isBut2Pressed){
 				isBut2Pressed = false;
 			}
@@ -583,7 +627,8 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 		}
 	}
 	
-	public void mouseMoved(MouseEvent e) {	
+	public void mouseMoved(MouseEvent e) {
+
 	}
 	
 	public void mouseDragged(MouseEvent e) {	
