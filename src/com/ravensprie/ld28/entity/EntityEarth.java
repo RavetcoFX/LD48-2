@@ -17,10 +17,10 @@ public class EntityEarth
 	
 	public boolean isAlive;
 	public static int x, y, width, height;
-	public int health = 100;
 	private int tickCount;
 	private boolean goUp = true;
 	private int cnt = 0;
+	private int bobHeight = 20;
 	
 	
 	public EntityEarth()
@@ -39,7 +39,7 @@ public class EntityEarth
 		if(isAlive){
 			if(goUp){ cnt++; y--; }
 			else{ cnt--; y++; }
-			if(cnt==40){ goUp=false; }
+			if(cnt==bobHeight){ goUp=false; }
 			if(cnt==0){ goUp=true; }
 		}
 	}
@@ -69,10 +69,6 @@ public class EntityEarth
 		return y;
 	}
 	
-	public int getHealth()
-	{
-		return health;
-	}
 	
 	public Rectangle getBounds()
 	{

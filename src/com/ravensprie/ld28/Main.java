@@ -6,14 +6,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.image.BufferStrategy;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferStrategy;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -37,23 +35,25 @@ public class Main extends Canvas implements Runnable, KeyListener
 	private static final long serialVersionUID = 602801997L;
 	
 	public static final String TITLE = "Only One Earth";
-	public static final String VERSION = "0.2";
+	public static final String VERSION = "0.3";
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 500;
+	public static final int FPS = 30;
 	
 	private JFrame frame;
-	
-	private long lastTimer;
-	
 	private EntityEarth earth;
 	public Color graphite = new Color(40, 40, 40);
+	public Color panel = new Color(140, 140, 140);
+	private Random rand = new Random();
 	
 	public ImageIcon imgMenu = new ImageIcon(this.getClass().getResource("/res/menu.png"));
+	public ImageIcon imgGloss = new ImageIcon(this.getClass().getResource("/res/gloss.png"));
 	public ImageIcon imgAboutBut1 = new ImageIcon(this.getClass().getResource("/res/but/button1.png"));
 	public ImageIcon imgAboutBut2 = new ImageIcon(this.getClass().getResource("/res/but/button2.png"));
 
 
 	public Image sprtMenu = imgMenu.getImage();
+	public Image sprtGloss = imgGloss.getImage();
 	public Image sprtBut1 = imgAboutBut1.getImage();
 	public Image sprtBut2 = imgAboutBut2.getImage();
 
@@ -65,6 +65,12 @@ public class Main extends Canvas implements Runnable, KeyListener
 	private boolean hasStarted = false;
 	
 	private int but1X = 596, but1Y = 237, but2X = 31, but2Y = 229;
+	private long lastTimer;
+	
+	public int oilLevel;
+	public int population;
+	public int freshWater;
+	public int polutionLevel;
 	
 	public Main()
 	{
@@ -102,14 +108,14 @@ public class Main extends Canvas implements Runnable, KeyListener
 	public void run() 
 	{
         long lastTime = System.nanoTime();
-        double nsPerTick = 1000000000D / 60D;
+        double skipTicks = 1000000000 / FPS;
         lastTimer = System.currentTimeMillis();
         double i1 = 0;
         
         while (running == true) 
         {
             long now = System.nanoTime();
-            i1 += (now - lastTime) / nsPerTick;
+            i1 += (now - lastTime) / skipTicks;
             lastTime = now;
             boolean shouldRender = true;
 
@@ -171,8 +177,15 @@ public class Main extends Canvas implements Runnable, KeyListener
 			g.fillRect(0, 0, WIDTH, HEIGHT);//draws the canvas
 			
 			if(hasStarted){
-				g.setColor(Color.WHITE);
+				
+				g.setColor(panel);
 				g.fillRect(0, 450, WIDTH, 50);
+				g.setColor(Color.BLACK);
+				g.drawString("Population: ", 0, 465);
+				g.setColor(Color.WHITE);
+				g.drawRect(75, 450, 100, 20);
+				
+				g.drawImage(sprtGloss, 0, 0, this);
 				
 				g.drawImage(earth.getSprt(), earth.getX(), earth.getY(), this);
 				
@@ -184,10 +197,31 @@ public class Main extends Canvas implements Runnable, KeyListener
 			}
 		}
 		
+		g.dispose();
+		bs.show();
+	}
+	
+	public void renderStars()
+	{
+		BufferStrategy bs = getBufferStrategy();
+ 		
+		if(bs == null){
+			createBufferStrategy(3); //triple buffered to ensure no tearing
+			return;
+		}
+		
+		Graphics2D g = (Graphics2D) bs.getDrawGraphics();
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		for(int i = 0; i<=200; i++){
+			g.setColor(Color.WHITE);
+			g.drawOval(rand.nextInt(800), rand.nextInt(500),1,1);
+		}
 		
 		g.dispose();
 		bs.show();
 	}
+	
 	
 	public void keyPressed(KeyEvent e)
 	{
@@ -199,6 +233,14 @@ public class Main extends Canvas implements Runnable, KeyListener
 				inGame = true;
 				System.out.println("Game Entered");
 			}
+		}
+		
+		if (keyCode == KeyEvent.VK_ESCAPE){
+			if(inGame){
+				inMenu = true;
+				inGame = false;
+				System.out.println("Game Exited");
+			}		
 		}
 		
 		if (keyCode == KeyEvent.VK_F3){
