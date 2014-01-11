@@ -97,11 +97,11 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	private boolean isBut2Pressed = false;
 	private boolean isBut3Pressed = false;
 	private boolean isBut4Pressed = false;
-	private boolean can1 = true;
-	private boolean can2 = true;
-	private boolean can3 = true;
-	private boolean can4 = true;
-	private boolean can5 = true;
+	private boolean can1 = false; //Population
+	private boolean can2 = false; //Resources
+	private boolean can3 = false; //Pollution
+	private boolean can4 = false; //Water
+	private boolean can5 = false; //Temp
 
 	private long lastTimer;
 	
@@ -369,8 +369,9 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 				g.setColor(Color.BLACK);
 				g.drawString("" + actTemp, 556, 468); //pollution num
 
-				g.drawImage(sprtGloss, 0, 448, this); //Panel Gloss
-				
+				for(int q=0;q<=WIDTH;q++){ //Draws gloss the width of the panel
+					g.drawImage(sprtGloss, q, 448, this); //Panel Gloss
+				}
 				g.drawImage(earth.sprt1, earth.getX(), earth.getY(), this); //Earth sprite
 				g.drawImage(earth.sprt2, earth.getX(), earth.getY(), this); //Earth sprite
 				g.drawImage(earth.sprt3, earth.getX(), earth.getY(), this); //Earth sprite
