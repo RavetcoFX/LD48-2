@@ -62,7 +62,6 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	public ImageIcon imgLogo = new ImageIcon(this.getClass().getResource("/res/ravenspire.png"));
 	public ImageIcon imgTitle = new ImageIcon(this.getClass().getResource("/res/title.png"));
 	public ImageIcon imgGloss = new ImageIcon(this.getClass().getResource("/res/gloss.png"));
-	public ImageIcon imgEarth = new ImageIcon(this.getClass().getResource("/res/earth.png"));
 	public ImageIcon imgMessage = new ImageIcon(this.getClass().getResource("/res/message.png"));
 	public ImageIcon imgAboutBut1 = new ImageIcon(this.getClass().getResource("/res/but/button1.png"));
 	public ImageIcon imgAboutBut2 = new ImageIcon(this.getClass().getResource("/res/but/button2.png"));
@@ -77,7 +76,6 @@ public class Main extends Canvas implements Runnable, KeyListener, MouseMotionLi
 	public Image sprtLogo = imgLogo.getImage();
 	public Image sprtTitle = imgTitle.getImage();
 	public Image sprtGloss = imgGloss.getImage();
-	public Image sprtEarth = imgEarth.getImage();
 	public Image sprtMssg = imgMessage.getImage();
 	public Image sprtBut1 = imgAboutBut1.getImage();
 	public Image sprtBut2 = imgAboutBut2.getImage();
